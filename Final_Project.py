@@ -5,21 +5,30 @@ import re
 import tweepy
 from matplotlib import colors as colors
 
+def RepresentsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 #Create a class called myStreamListener and find a specific word or phrase from a tweet
 class MyStreamListener(tweepy.StreamListener):
     color_array = []
 
     def on_status(self, status):
+        #words = status.text.split()
         regex = r'\w+'
         words = re.findall(regex, status.text)
         for word in words:
             if colors.is_color_like(word):
-                print(status.text)
-                print("Word: {}".format(word))
-                color = colors.to_rgb(word)
-                print("Color: {}".format(color))
-                self.color_array.append(color)
-                break
+                if not RepresentsInt(word) and len(word) > 1:
+                    print(status.text)
+                    print("Word: {}".format(word))
+                    color = colors.to_rgb(word)
+                    print("Color: {}".format(color))
+                    self.color_array.append(color)
+                    break
         
     def on_error(self, status_code):
         return False
@@ -41,4 +50,5 @@ MyStreamListener = MyStreamListener()
 myStream = tweepy.Stream(auth=api.auth, listener=MyStreamListener)
 
 #Track the word 'python' in every tweet that has been shown in Twitter
-myStream.filter(track=['thelastjedi'], async=True)
+myStream.filter(track=['ColorOfTheYear'], async=True)
+print("Listening...")
