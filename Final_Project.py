@@ -1,20 +1,25 @@
 #Authors: Elijah Gavett, Cyruz Campos
 #APPLIED FROM: http://docs.tweepy.org/en/v3.5.0/index.html
 
+import re
 import tweepy
-import matplotlib
-
-colors = ["red", "green", "blue", "yellow"]
+from matplotlib import colors as colors
 
 #Create a class called myStreamListener and find a specific word or phrase from a tweet
-class StreamListener(tweepy.StreamListener):
-
-    def __init__(self):
-        self.statuses = []
+class MyStreamListener(tweepy.StreamListener):
+    color_array = []
 
     def on_status(self, status):
-        print(status.text)
-        statuses.append(status.text)
+        regex = r'\w+'
+        words = re.findall(regex, status.text)
+        for word in words:
+            if colors.is_color_like(word):
+                print(status.text)
+                print("Word: {}".format(word))
+                color = colors.to_rgb(word)
+                print("Color: {}".format(color))
+                self.color_array.append(color)
+                break
         
     def on_error(self, status_code):
         return False
@@ -32,9 +37,8 @@ auth.set_access_token(access_key, access_secret)
 #Authenticate the login information
 api = tweepy.API(auth)
 
-listener = StreamListener()
-myStream = tweepy.Stream(auth=api.auth, listener=listener)
+MyStreamListener = MyStreamListener()
+myStream = tweepy.Stream(auth=api.auth, listener=MyStreamListener)
 
 #Track the word 'python' in every tweet that has been shown in Twitter
-myStream.filter(track=['CS313'], async=True)
-
+myStream.filter(track=['thelastjedi'], async=True)
