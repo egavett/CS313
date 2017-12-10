@@ -1,9 +1,15 @@
-#Authors: Elijah Gavett, Cyruz Campos
+#Authors: Elijah Gavett, Cyruz Campos, Christopher Blair-Garcia
 #APPLIED FROM: http://docs.tweepy.org/en/v3.5.0/index.html
+#APPLIED FROM: https://pypi.python.org/pypi/colored
 
 import re
 import tweepy
+import time
+import colored
+import os
+from colored import fg, bg, attr
 from matplotlib import colors as colors
+
 
 def RepresentsInt(s):
     try: 
@@ -23,10 +29,10 @@ class MyStreamListener(tweepy.StreamListener):
         for word in words:
             if colors.is_color_like(word):
                 if not RepresentsInt(word) and len(word) > 1:
-                    print(status.text)
-                    print("Word: {}".format(word))
-                    color = colors.to_rgb(word)
-                    print("Color: {}".format(color))
+                    #print(status.text)
+                    #print("Word: {}".format(word))
+                    color = colors.to_hex(word)
+                    #print("Color: {}".format(color))
                     self.color_array.append(color)
                     break
         
@@ -50,5 +56,21 @@ MyStreamListener = MyStreamListener()
 myStream = tweepy.Stream(auth=api.auth, listener=MyStreamListener)
 
 #Track the word 'python' in every tweet that has been shown in Twitter
-myStream.filter(track=['ColorOfTheYear'], async=True)
+myStream.filter(track=['trump'], async=True)
 print("Listening...")
+
+#print ('%s%s Hello World !!! %s' % (fg('white'), bg('yellow'), attr('reset')))
+
+while True:
+    time.sleep(5)
+    if MyStreamListener.color_array:
+        rgb_hex = MyStreamListener.color_array.pop(0)
+        color = fg ('#000000') + bg(rgb_hex)
+        reset = attr('reset')
+        os.system("cls")
+        for _ in range(0, 6):
+            print (color + '                          ' + reset)
+
+    else:
+        os.system("cls")
+        print('no color found')
